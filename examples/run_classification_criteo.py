@@ -47,6 +47,28 @@ if __name__ == "__main__":
 
     history = model.fit(train_model_input, train[target].values,
                         batch_size=256, epochs=10, verbose=2, validation_split=0.2, )
-    pred_ans = model.predict(test_model_input, batch_size=256)
+    pred_ans = model.predict(test_model_input, batch_size=1)
     print("test LogLoss", round(log_loss(test[target].values, pred_ans), 4))
     print("test AUC", round(roc_auc_score(test[target].values, pred_ans), 4))
+
+
+    test.index=range(len(test))
+    pred_series=pd.Series(pred_ans.tolist())
+    pred_series.name ='pred'
+    merge_res = test.merge(pred_series, right_index=True, left_index=True)
+    merge_res.to_csv('merge.csv')
+
+    model.save( "./model_dir/deepFM/1/")
+    print("model saved")
+
+    # from tensorflow import keras
+    # import tensorflow as tf
+    # sess=keras.backend.get_session()
+    #
+    # tf.saved_model.simple_save(
+    #     sess,
+    #     "./model_dir/1/",
+    #     inputs={i.name: i for i in model.inputs},
+    #     outputs={"ctr": model.output})
+    #
+    # print("model saved")

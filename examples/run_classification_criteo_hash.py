@@ -48,3 +48,20 @@ if __name__ == "__main__":
     pred_ans = model.predict(test_model_input, batch_size=256)
     print("test LogLoss", round(log_loss(test[target].values, pred_ans), 4))
     print("test AUC", round(roc_auc_score(test[target].values, pred_ans), 4))
+
+    import os
+    model.save(os.path.join('./model_dir/', '000000001'), 'my_model.h5')
+    model.save( "/Users/chandler/Documents/AIML_py/recsys/DeepCTR/examples/model_dir/hash",save_format='tf.keras.experimental.export_saved_model')
+
+    # from tensorflow import keras
+    # import tensorflow as tf
+    #
+    # sess = keras.backend.get_session()
+    #
+    # tf.saved_model.simple_save(
+    #     sess,
+    #     "/opt/ml/model/hash/",
+    #     inputs={i.name: i for i in model.inputs},
+    #     outputs={"ctr": model.output})
+    #
+    # print("model saved")
