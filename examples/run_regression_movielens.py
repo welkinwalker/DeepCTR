@@ -38,3 +38,6 @@ if __name__ == "__main__":
     pred_ans = model.predict(test_model_input, batch_size=256)
     print("test MSE", round(mean_squared_error(
         test[target].values, pred_ans), 4))
+
+    model.save( "./model_dir/ml-deepFM/1/")
+    print("model saved")
