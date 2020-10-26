@@ -68,6 +68,10 @@ def lambda_handler(event, context):
             'body': f"gender {event['gender']} invalid"
         }
 
+    data['age']=int(data['age'])
+    data['gender']=int(data['gender'])
+    data['occupation']=int(data['occupation'])
+
     m_list = ['m' + str(x) for x in event['movie_id']]
     m_strs = r.mget(m_list)
 

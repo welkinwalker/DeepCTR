@@ -88,3 +88,19 @@ curl --request POST \
    }
  ]
 }'
+
+
+curl --request POST \
+  --url https://g22odbj8s0.execute-api.ap-northeast-1.amazonaws.com/mvp-v1/ml/ \
+  --header 'content-type: application/json' \
+  --data '{
+	"age": 33,
+	"occupation": 18,
+	"gender": "M",
+	"movie_id": [
+		3045,
+		1221,
+		3092,
+		3374
+	]
+}'
