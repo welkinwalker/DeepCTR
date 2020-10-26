@@ -27,18 +27,45 @@ SERVING_URL = f"http://{the_ip}:8501/v1/models/ml-deepFM:predict"
 def lambda_handler(event, context):
     print(event)
 
-    # import requests as req
-    # resp = req.get(" http://18.180.157.88:8501/v1/models/deepFM/metadata")
-    # print(resp.text)
+    feat_dict = r.hgetall('ml-cate')
 
     predict_data = []
-    # data_criteo = '{"Unnamed: 0":1,"label":0,"I1":0.0,"I2":0.0029980013,"I3":0.0132669983,"I4":0.1086956522,"I5":0.6522125918,"I6":0.0,"I7":0.0,"I8":0.0714285714,"I9":0.005800464,"I10":0.0,"I11":0.0,"I12":0.0,"I13":0.1086956522,"C1":0,"C2":17,"C3":35,"C4":5,"C5":1,"C6":4,"C7":2,"C8":1,"C9":1,"C10":5,"C11":31,"C12":35,"C13":7,"C14":6,"C15":5,"C16":29,"C17":1,"C18":24,"C19":0,"C20":0,"C21":19,"C22":0,"C23":0,"C24":8,"C25":0,"C26":0,"pred":"[0.4257229268550873]"}'
-
-    u_str = r.get(f"u{event['user_id']}")
-    if u_str is None:
+    data = {}
+    age = int(event['age'])
+    if age < 10:
+        data['age'] = feat_dict['a1']
+    elif age < 20:
+        data['age'] = feat_dict['a18']
+    elif age < 30:
+        data['age'] = feat_dict['a25']
+    elif age < 40:
+        data['age'] = feat_dict['a35']
+    elif age < 50:
+        data['age'] = feat_dict['a45']
+    elif age < 60:
+        data['age'] = feat_dict['a56']
+    else:
         return {
-            'statusCode': 401,
-            'body': f"user_id {event['user_id']} invalid"
+            'statusCode': 412,
+            'body': f"age {event['age']} invalid"
+        }
+
+    occupation = int(event['occupation'])
+    if 0 <= occupation <= 20:
+        data['occupation'] = feat_dict['o' + str(occupation)]
+    else:
+        return {
+            'statusCode': 413,
+            'body': f"occupation {event['occupation']} invalid"
+        }
+
+    gender = event['gender']
+    if gender == 'F' or gender == 'M':
+        data['gender'] = feat_dict['g' + gender]
+    else:
+        return {
+            'statusCode': 414,
+            'body': f"gender {event['gender']} invalid"
         }
 
     m_list = ['m' + str(x) for x in event['movie_id']]
@@ -53,14 +80,7 @@ def lambda_handler(event, context):
                 'body': f"movie {event['movie_id'][m_idx]} invalid"
             }
         else:
-            udata = json.loads(u_str)
             mdata = json.loads(m_str)
-            data = {}
-            data['user_id'] = udata['user_id']
-            data['gender'] = udata['gender']
-            data['age'] = udata['age']
-            data['occupation'] = udata['occupation']
-            data['zip'] = udata['zip']
             data['movie_id'] = mdata['movie_id']
 
             data_new = {x: [y] for x, y in data.items()}
@@ -94,10 +114,6 @@ def lambda_handler(event, context):
     while m_idx < len(mid_list):
         res_dict[mid_list[m_idx]] = pred_list[m_idx][0]
         m_idx = m_idx + 1
-
-    # 推理结果排序
-    # final_dict = {k: v for k, v in sorted(res_dict.items(), key=lambda item: item[1])}
-    # print(final_dict)
 
     return {
         'statusCode': 200,

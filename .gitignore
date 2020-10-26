@@ -142,3 +142,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+examples/model_dir
+examples/dump.rdb

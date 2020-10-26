@@ -11,10 +11,8 @@ target = ['rating']
 # 1.Label Encoding for sparse features,and do simple Transformation for dense features
 for feat in sparse_features:
     lbe = LabelEncoder()
-    data[feat] = lbe.fit_transform(data[feat])
-tmpu = data['user_id'].copy()
-data['user_id'] = lbe.fit_transform(data['user_id'])
-data['ouid'] = tmpu
+    data[feat+'t'] = lbe.fit_transform(data[feat])
+
 
 tmpm = data['movie_id'].copy()
 data['movie_id'] = lbe.fit_transform(data['movie_id'])
@@ -24,16 +22,13 @@ dict = {}
 r = redis.Redis(host='localhost', port=6379, db=0)
 k_set = set([])
 for index, row in data.iterrows():
-    # if row.user_id in dict:
-    #     print(row.to_json())
-    #     print(dict[row.user_id])
-    #     print("=================")
-    # dict[row.user_id] = row.to_json()
 
-    if f"u{row.ouid}" not in k_set:
-        r.set(f"u{row.ouid}", row.to_json())
-        k_set.add(f"u{row.ouid}")
+    dict[f'g{row.gender}']=row.gendert
+    dict[f'a{row.age}']=row.aget
+    dict[f'o{row.occupation}']=row.occupationt
 
     if f"m{row.omid}" not in k_set:
         r.set(f"m{row.omid}", row.to_json())
         k_set.add(f"m{row.omid}")
+
+r.hmset('ml-cate',dict)
