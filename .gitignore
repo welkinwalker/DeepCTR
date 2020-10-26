@@ -145,3 +145,5 @@ $RECYCLE.BIN/
 
 examples/model_dir
 examples/dump.rdb
+examples/ml-1m
+examples/ml-1m.tar.gz
